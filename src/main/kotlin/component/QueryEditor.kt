@@ -1,9 +1,12 @@
+import common.executeCustomQuery
 import java.util.Collections
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 import javafx.application.Application
 import javafx.scene.Scene
+import javafx.scene.control.Button
+import javafx.scene.control.ToolBar
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
@@ -15,33 +18,44 @@ import org.fxmisc.richtext.model.StyleSpansBuilder
 import tornadofx.add
 
 class QueryEditor: VBox() {
+    private val PATTERN = generatePattern()
 
     init{
+
         val codeArea = CodeArea()
             codeArea.paragraphGraphicFactory = LineNumberFactory.get(codeArea)
 
         codeArea.richChanges()
         .filter { ch-> ch.getInserted() != ch.getRemoved() } // XXX
         .subscribe { change-> codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText())) }
-            codeArea.replaceText(0, 0, sampleCode)
-
+        val toolbar = ToolBar()
+        val executeButton = Button("Execute")
+        executeButton.setOnAction {
+            run {
+                executeCustomQuery(codeArea.text)
+            }
+        }
+        toolbar.items.add(executeButton)
+        add(toolbar)
         add(codeArea)
-
     }
 
-    companion object {
-
-        private val KEYWORDS = arrayOf("abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void", "volatile", "while")
-
-        private val KEYWORD_PATTERN = "\\b(" + KEYWORDS.joinToString("|") + ")\\b"
-        private val PAREN_PATTERN = "\\(|\\)"
-        private val BRACE_PATTERN = "\\{|\\}"
-        private val BRACKET_PATTERN = "\\[|\\]"
-        private val SEMICOLON_PATTERN = "\\;"
-        private val STRING_PATTERN = "\"([^\"\\\\]|\\\\.)*\""
-        private val COMMENT_PATTERN = "//[^\n]*" + "|" + "/\\*(.|\\R)*?\\*/"
-
-        private val PATTERN = Pattern.compile(
+    fun generatePattern(): Pattern {
+        val keyWordsText = QueryEditor::class.java!!.getResource("sql_key_words").readText()
+        val KEYWORDS:List<String> = keyWordsText.replace('\t',' ').replace('\n',' ').split(" ")
+        val KEYWORDS_LOWER:List<String> = KEYWORDS.map {
+            keyWordsText -> run {
+                keyWordsText.toLowerCase()
+            }
+        }
+        val KEYWORD_PATTERN = "\\b(" + (KEYWORDS+KEYWORDS_LOWER).joinToString("|") + ")\\b"
+        val PAREN_PATTERN = "\\(|\\)"
+        val BRACE_PATTERN = "\\{|\\}"
+        val BRACKET_PATTERN = "\\[|\\]"
+        val SEMICOLON_PATTERN = "\\;"
+        val STRING_PATTERN = "\"([^\"\\\\]|\\\\.)*\""
+        val COMMENT_PATTERN = "//[^\n]*" + "|" + "/\\*(.|\\R)*?\\*/"
+        val PATTERN = Pattern.compile(
                 "(?<KEYWORD>" + KEYWORD_PATTERN + ")"
                         + "|(?<PAREN>" + PAREN_PATTERN + ")"
                         + "|(?<BRACE>" + BRACE_PATTERN + ")"
@@ -50,8 +64,7 @@ class QueryEditor: VBox() {
                         + "|(?<STRING>" + STRING_PATTERN + ")"
                         + "|(?<COMMENT>" + COMMENT_PATTERN + ")"
         )
-
-        private val sampleCode = arrayOf("package com.example;", "", "import java.util.*;", "", "public class Foo extends Bar implements Baz {", "", "    /*", "     * multi-line comment", "     */", "    public static void main(String[] args) {", "        // single-line comment", "        for(String arg: args) {", "            if(arg.length() != 0)", "                System.out.println(arg);", "            else", "                System.err.println(\"Warning: empty string as argument\");", "        }", "    }", "", "}").joinToString("\n")
+        return PATTERN
     }
 
     private fun computeHighlighting(text:String):StyleSpans<Collection<String>> {

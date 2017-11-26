@@ -1,10 +1,12 @@
 package component
 
+import common.DataStorage
 import common.establishConnection
 import common.getAllTables
 import dialogs.ErrorAlertWithException
 import dialogs.SetUpConnectionDialog
 import javafx.scene.control.*
+import tornadofx.onChange
 import java.util.*
 
 

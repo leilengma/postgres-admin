@@ -1,5 +1,6 @@
 package common
 
+import dialogs.ErrorAlertWithException
 import java.sql.ResultSet
 
 
@@ -81,10 +82,10 @@ fun deleteEntityById(tableName: String, id:String){
 fun executeCustomQuery(query: String){
     val stat = connection?.createStatement()
     if(stat != null) {
-        if(query.length>5 && query.substring(0, 6).toUpperCase() == "SELECT") {
+        if (query.length > 5 && query.substring(0, 6).toUpperCase() == "SELECT") {
             val rs = stat.executeQuery(query)
             extractQueryResult(rs)
-        }else{
+        } else {
             val rs = stat.execute(query)
             DataStorage.customQueryResult.set(rs)
         }

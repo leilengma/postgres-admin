@@ -44,6 +44,6 @@ class TableDataController():VBox(){
         }
         tableToolbar.items.addAll(tableRefresh, addEntry, delEntry)
         add(tableToolbar)
-        dataTable.minHeightProperty().bind(this.heightProperty().minus(tableToolbar.heightProperty()))
+        dataTable.prefHeightProperty().bind(this.heightProperty().minus(tableToolbar.heightProperty()))
     }
 }

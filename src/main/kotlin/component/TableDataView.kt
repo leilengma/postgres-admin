@@ -60,7 +60,7 @@ class TableDataView:TableView<Map<String, String>>(){
         if (data.isEmpty())
             return
         getColumns().clear()
-        val columns = data[0].keys.toList();
+        val columns = data[0].keys.toList()
         for(column in columns){
             val tableColumn = TableColumn<Map<String, String>, String>(column)
             tableColumn.setCellValueFactory {

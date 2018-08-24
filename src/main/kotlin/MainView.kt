@@ -4,12 +4,8 @@ import component.TableDataController
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.geometry.Orientation
 import javafx.scene.control.*
-import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
-import org.fxmisc.richtext.CodeArea
 import tornadofx.*
-import org.fxmisc.richtext.LineNumberFactory
-
 
 
 class MainView :View(){
@@ -34,6 +30,12 @@ class MainView :View(){
         val tablesView = VBox()
         tablesView.prefWidthProperty().bind(mainPannel.widthProperty().divide(3))
         tablesView += Label("Tables:")
+        val searchText = TextField("")
+        searchText.setOnKeyTyped {
+            event -> run {
+                searchText.text()
+            }
+        }
         tablesView += tableList
         val tablesToolbar = ToolBar()
         val tablesRefresh = Button("Refresh")
@@ -41,6 +43,7 @@ class MainView :View(){
         tablesView += tablesToolbar
         mainPannel += tablesView
         mainPannel.add(tableDataController)
+        tableList.prefHeightProperty().bind(tablesView.heightProperty())
         tableDataController.prefWidthProperty().bind(mainPannel.widthProperty().minus(tablesView.widthProperty()))
         root += mainPannel
         root += QueryEditor()

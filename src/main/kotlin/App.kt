@@ -2,6 +2,7 @@ import common.connection
 import javafx.application.Application
 import javafx.stage.Stage
 import tornadofx.*
+import java.net.URL
 
 
 class HelloWorldApp: App(MainView::class, Styles::class){
@@ -10,9 +11,9 @@ class HelloWorldApp: App(MainView::class, Styles::class){
             minWidth = 800.0
             minHeight = 600.0
         }
-
         super.start(stage)
         stage.scene.stylesheets.add(HelloWorldApp::class.java!!.getResource("java-keywords.css").toExternalForm())
+
     }
 
     override fun stop() {

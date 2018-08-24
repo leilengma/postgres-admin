@@ -1,4 +1,5 @@
 import common.executeCustomQuery
+import dialogs.ErrorAlertWithException
 import java.util.Collections
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -32,12 +33,18 @@ class QueryEditor: VBox() {
         val executeButton = Button("Execute")
         executeButton.setOnAction {
             run {
-                executeCustomQuery(codeArea.text)
+                try {
+                    executeCustomQuery(codeArea.text)
+                }catch (e:Exception){
+                    ErrorAlertWithException(e).showAndWait();
+                }
             }
         }
         toolbar.items.add(executeButton)
         add(toolbar)
         add(codeArea)
+        codeArea.onKeyPressed
+        codeArea.prefHeightProperty().bind(this.heightProperty())
     }
 
     fun generatePattern(): Pattern {
